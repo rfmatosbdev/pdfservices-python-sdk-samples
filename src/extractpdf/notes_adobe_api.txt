@@ -1,0 +1,124 @@
+Para detectar o título principal:
+. Avaliar o path "//Document/Title".
+
+Para identificar capítulos e seções:
+. Avaliar o path "//Document/H1".
+. Observar que a cada novo path contendo "H1" temos o incremento das secoes "//Document/Sect[3]/H1".
+. Todos os demais paragrafos dentro dessa secao, independentemente de "Page", representam seus respectivos bodies.
+. IMPORTANT: detectar "Path" de secoes H1 ou H2 "//Document/H1[14]" cujos "Text" contenham a palavra "References" e eliminar tudo.
+
+Para identificar um abstract:
+. Avaliar se é parágrafo "//Document/P[8]";
+. Avaliar a existência da palavra 'keyword' "Keywords: gratitude, app…lationship maintenance " no início da setença, o que caracteriza abstract o parágrafo imediatamente anterior.
+
+Para identificar notas de rodapé:
+. Da forma mais direta, simplesmente identificar o path "//Document/Footnote".
+. Na sequência de um parágrafo "//Document/P[7]" ou "//Document/P[20]/ParagraphSpan[2]", identificar a diminuição da fonte "TextSize".
+. Enquanto a fonte permanecer a mesma, significa que a nota de rodape possui diversos paragrafos.
+. O retorno do paragrafo a sua fonte normal diz que o paragrafo pertence ao capitulo/secao "H1" original.
+. Descartar footnotes "//Document/Footnote[4]" que sejam precedidos por uma tabela, pois as mesmas serao descartadas.
+
+Para identificar e eliminar o "footer":
+. Avaliar o tamanho da fonte "TextSize".
+. Se for menor ou igual 2 pontos abaixo da fonte do texto (fonte pequena), então podemos considera-lo como footer;
+. IMPORTANTE: atencao para o fato de que uma nota de rodape, quando referenciada por um numero dentro de um texto comum, vai caracterizar todo o paragrafo com a menor fonte possivel, criando um falso positivo "footer" para ser eliminado.
+
+Para detectar autor(es) (esta parte ainda nao esta muito bem definida):
+. Avaliar parágrafo "//Document/P[10]".
+. Avaliar troca de fontes "TextSize" (tamanho fora do padrao).
+. Avaliar textos curtos anteriores ao abstract.
+
+Para detectar bodies com listas (topicos):
+. Avaliar se dentro de um paragrafo existe a opcao LI "//Document/Sect[4]/Sect/L/LI[14]/...".
+. Avaliar o marcador de cada item dessa lista contendo LBL "//Document/Sect[4]/Sect/L/LI[14]/Lbl".
+. Avaliar cada item da lista que sucede o marcador e tem como item LBODY "//Document/Sect[4]/Sect/L/LI[14]/LBody".
+
+Para identificar numeracao de paginas coerentes com titulos, capitulos, secoes e seus respectivos bodies:
+. Avaliar a chave "Page" que fica no mesmo nivel de "Path".
+
+Para extrair Body dos elementos da pagina:
+. Buscar por paragrafos como "//Document/P[20]/ParagraphSpan[2]" ou "//Document/P[10]".
+. Pode-se usar o Sub "//Document/P[44]/Sub" ou "//Document/P[44]/Sub[2]" para secoes com nomes das tabelas que serao descartadas.
+
+Eliminar chaves do tipo:
+. Aside "//Document/Sect[2]/Aside/P".
+. Figure "//Document/Sect/Figure" ou "//Document/Figure".
+. Table "//Document/Sect[4]/Sect/Table".
+    . Alem do layout da tabela "//Document/Sect[4]/Sect/Table/TR/TH".
+    . "//Document/Sect[4]/Sect/Table/TR/TH/P".
+    . "//Document/Sect[4]/Sect/Table/TR[5]/TD[2]"
+. Seções como "version", "extended_metadata" e "pages" (preservar apenas "elements").
+
+Para detectar datas importantes de um paper cientifico:
+. Avaliar a presenca de "Path" e "Text" contendo palavras como Received, Revision e Accepted combinadas com datas para detectar as datas no documento.
+. Geralmente as variaveis a seguir sao encontradas naa ultima pagina do documento, apos as referencias:
+    . Path	"//Document/P[206]/Sub"
+    . Text	"Received January 6, 2011"
+    . Path	"//Document/P[206]/Sub[2]"
+    . Text	"Revision received April 18, 2012"
+    . Path	"//Document/P[207]"
+    . Text	"Accepted April 23, 2012"
+
+
+    ===============
+To detect the main title:
+. Evaluate the path "//Document/Title".
+
+To identify chapters and sections:
+. Evaluate the path "//Document/H1".
+. Note that with each new path containing "H1" we have the increment of the sections "//Document/Sect[3]/H1".
+. All the other paragraphs within this section, regardless of "Page", represent their respective bodies.
+. IMPORTANT: detect "Path" of H1 or H2 sections "//Document/H1[14]" whose "Text" contains the word "References" and delete everything.
+
+To identify an abstract:
+. Evaluate whether it is a paragraph "//Document/P[8]";
+. Check for the keyword "Keywords: gratitude, app...lationship maintenance" at the beginning of the sentence, which characterizes the immediately preceding paragraph as an abstract.
+
+To identify footnotes:
+. In the most direct way, simply identify the path "//Document/Footnote".
+. In the sequence of a paragraph "//Document/P[7]" or "//Document/P[20]/ParagraphSpan[2]", identify the decrease in font "TextSize".
+. As long as the font remains the same, the footnote has several paragraphs.
+. Returning the paragraph to its normal font means that the paragraph belongs to the original "H1" chapter/section.
+. Discard footnotes "//Document/Footnote[4]" that are preceded by a table, as they will be discarded.
+
+To identify and delete the footer:
+. Evaluate the font size "TextSize".
+. If it is less than or equal to 2 points below the text font (small font), then it can be considered a footer.
+
+. IMPORTANT: pay attention to the fact that a footnote, when referenced by a number within a common text, will characterize the entire paragraph with the smallest possible font, creating a false positive "footer" to be eliminated.
+
+To detect author(s) (this part is not yet very well defined):
+. Evaluate paragraph "//Document/P[10]".
+. Evaluate font change "TextSize" (non-standard size).
+. Evaluate short texts preceding the abstract.
+
+To detect bodies with lists (topics):
+. Evaluate whether the LI option "//Document/Sect[4]/Sect/L/LI[14]/..." exists within a paragraph.
+. Evaluate the marker for each item in this list containing LBL "//Document/Sect[4]/Sect/L/LI[14]/Lbl".
+. Evaluate each item in the list that follows the bookmark and has LBODY "//Document/Sect[4]/Sect/L/LI[14]/LBody".
+
+To identify page numbers consistent with titles, chapters, sections and their respective bodies:
+. Evaluate the "Page" key, which is at the same level as "Path".
+
+To extract bodies from page elements:
+. Search for paragraphs such as "//Document/P[20]/ParagraphSpan[2]" or "//Document/P[10]".
+. You can use the Sub "//Document/P[44]/Sub" or "//Document/P[44]/Sub[2]" for sections with table names that will be discarded.
+
+Delete keys of type:
+. Aside "//Document/Sect[2]/Aside/P".
+. Figure "//Document/Sect/Figure" or "//Document/Figure".
+. Table "//Document/Sect[4]/Sect/Table".
+    . In addition to the table layout "//Document/Sect[4]/Sect/Table/TR/TH".
+    . "//Document/Sect[4]/Sect/Table/TR/TH/P".
+    . "//Document/Sect[4]/Sect/Table/TR[5]/TD[2]"
+. Sections such as "version", "extended_metadata" and "pages" (preserve only "elements").
+
+To detect important dates in a scientific paper:
+. Evaluate the presence of "Path" and "Text" containing words like Received, Revision and Accepted combined with dates to detect the dates in the document.
+. The following variables are usually found on the last page of the document, after the references:
+    . Path "//Document/P[206]/Sub"
+    . Text "Received January 6, 2011"
+    . Path "//Document/P[206]/Sub[2]"
+    . Text "Revision received April 18, 2012"
+    . Path "//Document/P[207]"
+    . Text "Accepted April 23, 2012"
