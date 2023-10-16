@@ -90,7 +90,8 @@ To identify and delete the footer:
 To detect author(s) (this part is not yet very well defined):
 . Evaluate paragraph "//Document/P[10]".
 . Evaluate font change "TextSize" (non-standard size).
-. Evaluate short texts preceding the abstract.
+. Evaluate short texts preceding the abstract (for scientific papers).
+. Path type Paragraph (P) beginning with "by" or that has a one line text with the word 'author' inside: "By (<https://www.theatlantic.com/author/arthur-c-brooks/>)(<https://www.theatlantic.com/author/arthur-c-brooks/>)Arthur C. Brooks "
 
 To detect bodies with lists (topics):
 . Evaluate whether the LI option "//Document/Sect[4]/Sect/L/LI[14]/..." exists within a paragraph.
@@ -106,6 +107,8 @@ To extract bodies from page elements:
 
 Delete keys of type:
 . Aside "//Document/Sect[2]/Aside/P".
+. Reference "//Document/P[14]/Reference".
+. StyleSpan "//Document/P/StyleSpan".
 . Figure "//Document/Sect/Figure" or "//Document/Figure".
 . Table "//Document/Sect[4]/Sect/Table".
     . In addition to the table layout "//Document/Sect[4]/Sect/Table/TR/TH".
