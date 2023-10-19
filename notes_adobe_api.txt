@@ -1,66 +1,3 @@
-Para detectar o título principal:
-. Avaliar o path "//Document/Title".
-
-Para identificar capítulos e seções:
-. Avaliar o path "//Document/H1".
-. Observar que a cada novo path contendo "H1" temos o incremento das secoes "//Document/Sect[3]/H1".
-. Todos os demais paragrafos dentro dessa secao, independentemente de "Page", representam seus respectivos bodies.
-. IMPORTANT: detectar "Path" de secoes H1 ou H2 "//Document/H1[14]" cujos "Text" contenham a palavra "References" e eliminar tudo.
-
-Para identificar um abstract:
-. Avaliar se é parágrafo "//Document/P[8]";
-. Avaliar a existência da palavra 'keyword' "Keywords: gratitude, app…lationship maintenance " no início da setença, o que caracteriza abstract o parágrafo imediatamente anterior.
-
-Para identificar notas de rodapé:
-. Da forma mais direta, simplesmente identificar o path "//Document/Footnote".
-. Na sequência de um parágrafo "//Document/P[7]" ou "//Document/P[20]/ParagraphSpan[2]", identificar a diminuição da fonte "TextSize".
-. Enquanto a fonte permanecer a mesma, significa que a nota de rodape possui diversos paragrafos.
-. O retorno do paragrafo a sua fonte normal diz que o paragrafo pertence ao capitulo/secao "H1" original.
-. Descartar footnotes "//Document/Footnote[4]" que sejam precedidos por uma tabela, pois as mesmas serao descartadas.
-
-Para identificar e eliminar o "footer":
-. Avaliar o tamanho da fonte "TextSize".
-. Se for menor ou igual 2 pontos abaixo da fonte do texto (fonte pequena), então podemos considera-lo como footer;
-. IMPORTANTE: atencao para o fato de que uma nota de rodape, quando referenciada por um numero dentro de um texto comum, vai caracterizar todo o paragrafo com a menor fonte possivel, criando um falso positivo "footer" para ser eliminado.
-
-Para detectar autor(es) (esta parte ainda nao esta muito bem definida):
-. Avaliar parágrafo "//Document/P[10]".
-. Avaliar troca de fontes "TextSize" (tamanho fora do padrao).
-. Avaliar textos curtos anteriores ao abstract.
-
-Para detectar bodies com listas (topicos):
-. Avaliar se dentro de um paragrafo existe a opcao LI "//Document/Sect[4]/Sect/L/LI[14]/...".
-. Avaliar o marcador de cada item dessa lista contendo LBL "//Document/Sect[4]/Sect/L/LI[14]/Lbl".
-. Avaliar cada item da lista que sucede o marcador e tem como item LBODY "//Document/Sect[4]/Sect/L/LI[14]/LBody".
-
-Para identificar numeracao de paginas coerentes com titulos, capitulos, secoes e seus respectivos bodies:
-. Avaliar a chave "Page" que fica no mesmo nivel de "Path".
-
-Para extrair Body dos elementos da pagina:
-. Buscar por paragrafos como "//Document/P[20]/ParagraphSpan[2]" ou "//Document/P[10]".
-. Pode-se usar o Sub "//Document/P[44]/Sub" ou "//Document/P[44]/Sub[2]" para secoes com nomes das tabelas que serao descartadas.
-
-Eliminar chaves do tipo:
-. Aside "//Document/Sect[2]/Aside/P".
-. Figure "//Document/Sect/Figure" ou "//Document/Figure".
-. Table "//Document/Sect[4]/Sect/Table".
-    . Alem do layout da tabela "//Document/Sect[4]/Sect/Table/TR/TH".
-    . "//Document/Sect[4]/Sect/Table/TR/TH/P".
-    . "//Document/Sect[4]/Sect/Table/TR[5]/TD[2]"
-. Seções como "version", "extended_metadata" e "pages" (preservar apenas "elements").
-
-Para detectar datas importantes de um paper cientifico:
-. Avaliar a presenca de "Path" e "Text" contendo palavras como Received, Revision e Accepted combinadas com datas para detectar as datas no documento.
-. Geralmente as variaveis a seguir sao encontradas naa ultima pagina do documento, apos as referencias:
-    . Path	"//Document/P[206]/Sub"
-    . Text	"Received January 6, 2011"
-    . Path	"//Document/P[206]/Sub[2]"
-    . Text	"Revision received April 18, 2012"
-    . Path	"//Document/P[207]"
-    . Text	"Accepted April 23, 2012"
-
-
-    ===============
 To detect the main title:
 . Evaluate the path "//Document/Title".
 
@@ -125,3 +62,47 @@ To detect important dates in a scientific paper:
     . Text "Revision received April 18, 2012"
     . Path "//Document/P[207]"
     . Text "Accepted April 23, 2012"
+
+=========
+Conclusion - WCO-92:
+According to the techniques evaluated in the PDF parsing process, the use of several combined techniques is noted, namely:
+1. Considering the different categories of PDFs (books, articles and scientific papers), we must distinguish between them before choosing the tools.
+2. If the books are published directly by the publishers, they will certainly come with their own metadata, including authors, chapters, sections, date of publication and content. This makes the use of the Pymupdf library sufficient.
+3. For scientific papers that follow stricter formatting standards, we can use GrobId.
+4. For PDF articles created from the web that don't follow strict standards, or even books generated from scans of works that weren't generated with their respective metadata, we need to use a combination of these. A formula that can be applied, in order of priority, would be Pymupdf, followed by GrobId and, if the file is less than 1MB, Adobe Parsing API.
+5. The latter can even be applied to all categories (books, articles and scientific papers) that don't have metadata, as it extracts information and groups it into JSON-structured tags, which I've mapped in the comment https://bairesdev.atlassian.net/browse/WCO-92?focusedCommentId=3214579.
+
+============
+Conclusion - WCO-93:
+
+The template to be used for "Clean up raw data - remove footers, headers, images..." will be as follows:
+
+1. Within the respective Python libraries (Pymupdf, GrobId), we will load only the elements necessary for the composition of the requested items, such as authors, titles, body, etc.
+
+2. If you are using the Adobe Parsing API model, follow the steps below, collecting only the elements you are interested in and excluding other tags from the resulting JSON to make the file smaller:
+
+To detect bodies with lists (topics):
+. Evaluate whether the LI option "//Document/Sect[4]/Sect/L/LI[14]/..." exists within a paragraph.
+. Evaluate the marker for each item in this list containing LBL "//Document/Sect[4]/Sect/L/LI[14]/Lbl".
+. Evaluate each item in the list that follows the bookmark and has LBODY "//Document/Sect[4]/Sect/L/LI[14]/LBody".
+
+To extract bodies from page elements:
+. Search for paragraphs such as "//Document/P[20]/ParagraphSpan[2]" or "//Document/P[10]".
+. You can use the Sub "//Document/P[44]/Sub" or "//Document/P[44]/Sub[2]" for sections with table names that will be discarded.
+
+Delete keys of type:
+. Aside "//Document/Sect[2]/Aside/P".
+. Reference "//Document/P[14]/Reference".
+. StyleSpan "//Document/P/StyleSpan".
+. Figure "//Document/Sect/Figure" or "//Document/Figure".
+. Table "//Document/Sect[4]/Sect/Table".
+    . In addition to the table layout "//Document/Sect[4]/Sect/Table/TR/TH".
+    . "//Document/Sect[4]/Sect/Table/TR/TH/P".
+    . "//Document/Sect[4]/Sect/Table/TR[5]/TD[2]"
+. Sections such as "version", "extended_metadata" and "pages" (preserve only "elements").
+
+
+============================
+    buffer_pdf = fitz.open()
+    buffer_pdf.insert_pdf(doc, from_page=page_num, to_page=page_num)
+nesse caso buffer_pdf seria o pdf com as paginas que vc quer... doc é o pdf que foi aberto usando fitz.open() (fitz é o pymupdf).
